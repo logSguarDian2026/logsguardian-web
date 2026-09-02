@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Evaluation &amp; Measured Performance</title>
+<meta name="description" content="Full measured performance for logSguarDian: RF/IF metrics, per-class detection rates, latency, dataset sources, and the WAF defense-in-depth evaluation against ModSecurity + OWASP CRS." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230e8f73%22/><path d=%22M30 52 L45 67 L72 34%22 stroke=%22%23f4f6f5%22 stroke-width=%229%22 fill=%22none%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>" />
+<link rel="stylesheet" href="css/tokens.css" />
+<link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="wrap">
+    <a href="index.html" class="brand"><span class="mark">◆</span> logSguarDian</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Product</a></li>
+      <li><a href="evaluation.html" aria-current="page">Evaluation</a></li>
+      <li><a href="limitations.html">Limitations</a></li>
+      <li><a href="docs.html">Docs</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a class="btn btn-ghost btn-text" href="https://github.com/xtsebas/logSguarDian" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn btn-primary" href="https://www.npmjs.com/package/logsguardian" target="_blank" rel="noopener">npm install</a>
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+        <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<header class="wrap" style="padding:3.5rem 0 1rem;">
+  <span class="eyebrow">Evaluation</span>
+  <h1 style="font-size:var(--step-3)">Measured performance</h1>
+  <p class="lede">Every figure below traces to a specific test set, live-traffic run, or independent payload corpus described in the repo's <code>docs/</code>. Where a number changed between model versions, we cite the current one and note the history.</p>
+</header>
+
+<section class="tight">
+  <div class="wrap">
+    <div class="stat-grid">
+      <div class="stat"><span class="num">0.9996</span><span class="label">RF precision, held-out test set (n=59,947)</span></div>
+      <div class="stat"><span class="num">0.9989</span><span class="label">RF recall, held-out test set</span></div>
+      <div class="stat"><span class="num">0.9682</span><span class="label">RF macro F1, all 5 classes</span></div>
+      <div class="stat"><span class="num">245MB</span><span class="label">Worker-pool RSS (1 RF + 2 IF workers), under 300MB gate</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="rf-metrics">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Random Forest</span>
+      <h2>Per-class precision, recall, F1</h2>
+      <p class="lede">Held-out test set, n=59,947 requests, current shipped model. cmdi is the hardest class to separate — see <a href="limitations.html#cmdi">limitation #1</a> for why.</p>
+    </div>
+
+    <div class="chart">
+      <div class="legend">
+        <span class="swatch"><span class="dot" style="background:var(--cls-sqli)"></span>sqli</span>
+        <span class="swatch"><span class="dot" style="background:var(--cls-xss)"></span>xss</span>
+        <span class="swatch"><span class="dot" style="background:var(--cls-path)"></span>path_traversal</span>
+        <span class="swatch"><span class="dot" style="background:var(--cls-cmdi)"></span>cmdi</span>
+        <span class="swatch"><span class="dot" style="background:var(--border-strong)"></span>benign</span>
+      </div>
+
+      <div class="bar-row"><span class="bar-label">sqli — F1</span><div class="bar-track"><div class="bar-fill" data-pct="99.55" style="background:var(--cls-sqli)"></div></div><span class="bar-val">0.9955</span></div>
+      <div class="bar-row"><span class="bar-label">xss — F1</span><div class="bar-track"><div class="bar-fill" data-pct="98.44" style="background:var(--cls-xss)"></div></div><span class="bar-val">0.9844</span></div>
+      <div class="bar-row"><span class="bar-label">path_traversal — F1</span><div class="bar-track"><div class="bar-fill" data-pct="96.71" style="background:var(--cls-path)"></div></div><span class="bar-val">0.9671</span></div>
+      <div class="bar-row"><span class="bar-label">cmdi — F1</span><div class="bar-track"><div class="bar-fill" data-pct="89.54" style="background:var(--cls-cmdi)"></div></div><span class="bar-val">0.8954</span></div>
+      <div class="bar-row"><span class="bar-label">benign — F1</span><div class="bar-track"><div class="bar-fill" data-pct="99.86" style="background:var(--border-strong)"></div></div><span class="bar-val">0.9986</span></div>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Class</th><th class="num">Precision</th><th class="num">Recall</th><th class="num">F1</th><th class="num">Support</th></tr></thead>
+        <tbody>
+          <tr><td>benign</td><td class="num">0.9980</td><td class="num">0.9992</td><td class="num">0.9986</td><td class="num">18,042</td></tr>
+          <tr><td>cmdi</td><td class="num">0.8749</td><td class="num">0.9170</td><td class="num">0.8954</td><td class="num">831</td></tr>
+          <tr><td>path_traversal</td><td class="num">0.9694</td><td class="num">0.9648</td><td class="num">0.9671</td><td class="num">2,526</td></tr>
+          <tr><td>sqli</td><td class="num">0.9953</td><td class="num">0.9956</td><td class="num">0.9955</td><td class="num">34,085</td></tr>
+          <tr><td>xss</td><td class="num">0.9911</td><td class="num">0.9778</td><td class="num">0.9844</td><td class="num">4,463</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="chart-sub" style="margin-top:0.8rem;">cmdi F1 has moved across retrains as the corpus grew: 0.8954 → 0.902 with SMOTE tuning (a ceiling — see limitations) → 0.895 on the current minimal-context retrain (rf_v10/if_v9), the figure the CLI's <code>attacks inspect cmdi</code> reports as the locked test-set number.</p>
+  </div>
+</section>
+
+<section class="bg-sunken">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Live E2E detection</span>
+      <h2>Detection rate against a running instance, not just the test set</h2>
+      <p class="lede">100 payloads per class, run against a live Express app with the shipped rf_v10/if_v9 worker-pool build.</p>
+    </div>
+    <div class="chart">
+      <div class="bar-row"><span class="bar-label">sqli</span><div class="bar-track"><div class="bar-fill" data-pct="100" style="background:var(--cls-sqli)"></div></div><span class="bar-val">100/100</span></div>
+      <div class="bar-row"><span class="bar-label">xss</span><div class="bar-track"><div class="bar-fill" data-pct="100" style="background:var(--cls-xss)"></div></div><span class="bar-val">100/100</span></div>
+      <div class="bar-row"><span class="bar-label">path_traversal</span><div class="bar-track"><div class="bar-fill" data-pct="93" style="background:var(--cls-path)"></div></div><span class="bar-val">93/100</span></div>
+      <div class="bar-row"><span class="bar-label">cmdi</span><div class="bar-track"><div class="bar-fill" data-pct="100" style="background:var(--cls-cmdi)"></div></div><span class="bar-val">100/100</span></div>
+    </div>
+    <p class="chart-sub">An earlier suite (rf_v3/if_v2, 100 payloads/class) measured sqli 99–100%, xss 94.0%, path_traversal 100%, cmdi 95.0%, with a 2.0% benign false-positive rate — included here because the two runs used different payload sets and both are honest snapshots of their model version.</p>
+  </div>
+</section>
+
+<section id="latency">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Latency</span>
+      <h2>Small in absolute terms, large in relative terms</h2>
+      <p class="lede">This is the one metric where the project's own target isn't met, and we say so plainly rather than burying it.</p>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h4>Absolute overhead</h4>
+        <p>~0.1–15ms depending on environment. In a real Docker + Postgres deployment — the most representative environment — p95 overhead lands around 7–9ms (baseline ~4–5ms → with logSguarDian ~12–14ms).</p>
+      </div>
+      <div class="card">
+        <h4>Relative overhead</h4>
+        <p>+70% to +340% depending on build and environment, against the project's own ≤10% relative target. Relative-percentage overhead is mathematically punishing against a near-instant baseline: <code>Δp95_relative = ε / p95_baseline</code> diverges as the baseline approaches zero for any nonzero ε — a structural property of the metric, not evidence of a slow implementation, but the gate is not met and we're not going to dress that up.</p>
+      </div>
+    </div>
+    <div class="table-scroll" style="margin-top:1.5rem;">
+      <table>
+        <thead><tr><th>Measurement</th><th class="num">p50</th><th class="num">p95</th><th class="num">p99</th></tr></thead>
+        <tbody>
+          <tr><td>Feature extractor (mixed traffic, main thread)</td><td class="num">—</td><td class="num">0.0082ms</td><td class="num">—</td></tr>
+          <tr><td>ONNX worker round-trip</td><td class="num">0.823ms</td><td class="num">1.044ms</td><td class="num">1.130ms</td></tr>
+          <tr><td>Bare-Node middleware (Windows/WSL2, 50 arr/s)</td><td class="num">—</td><td class="num">+0ms vs baseline</td><td class="num">—</td></tr>
+          <tr><td>Docker + Postgres, full hybrid (realistic deployment)</td><td class="num">—</td><td class="num">~7–9ms overhead</td><td class="num">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="bg-sunken" id="defense-in-depth">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Defense-in-depth evaluation</span>
+      <h2>logSguarDian behind ModSecurity + OWASP CRS</h2>
+      <p class="lede">Stack: Nginx + ModSecurity v3 + OWASP CRS at Paranoia Level 1 — the realistic default for a team without dedicated WAF-tuning staff, not artificially weakened — reverse-proxying to an Express + logSguarDian app backed by Postgres. Corpus: 590 payloads from SecLists (seed=42, deduplicated): 77 sqli, 113 xss, 200 of 881 unique path_traversal, 200 of 8,262 unique cmdi.</p>
+    </div>
+
+    <div class="legend">
+      <span class="swatch"><span class="dot" style="background:var(--border-strong)"></span>No protection</span>
+      <span class="swatch"><span class="dot" style="background:var(--accent)"></span>logSguarDian only</span>
+      <span class="swatch"><span class="dot" style="background:var(--warning)"></span>WAF only (CRS, PL1)</span>
+      <span class="swatch"><span class="dot" style="background:var(--critical)"></span>WAF + logSguarDian (layered)</span>
+    </div>
+
+    <div class="grouped-chart" role="img" aria-label="Detection rate per attack class across four configurations">
+      <div class="group">
+        <div class="group-bars">
+          <div class="gbar" data-pct="0" style="background:var(--border-strong)"><span class="gval">0%</span></div>
+          <div class="gbar" data-pct="98.7" style="background:var(--accent)"><span class="gval">98.7%</span></div>
+          <div class="gbar" data-pct="85.7" style="background:var(--warning)"><span class="gval">85.7%</span></div>
+          <div class="gbar" data-pct="100" style="background:var(--critical)"><span class="gval">100%</span></div>
+        </div>
+        <div class="group-name">sqli (77)</div>
+      </div>
+      <div class="group">
+        <div class="group-bars">
+          <div class="gbar" data-pct="0" style="background:var(--border-strong)"><span class="gval">0%</span></div>
+          <div class="gbar" data-pct="97.3" style="background:var(--accent)"><span class="gval">97.3%</span></div>
+          <div class="gbar" data-pct="97.3" style="background:var(--warning)"><span class="gval">97.3%</span></div>
+          <div class="gbar" data-pct="100" style="background:var(--critical)"><span class="gval">100%</span></div>
+        </div>
+        <div class="group-name">xss (113)</div>
+      </div>
+      <div class="group">
+        <div class="group-bars">
+          <div class="gbar" data-pct="0" style="background:var(--border-strong)"><span class="gval">0%</span></div>
+          <div class="gbar" data-pct="98.5" style="background:var(--accent)"><span class="gval">98.5%</span></div>
+          <div class="gbar" data-pct="87.0" style="background:var(--warning)"><span class="gval">87.0%</span></div>
+          <div class="gbar" data-pct="98.5" style="background:var(--critical)"><span class="gval">98.5%</span></div>
+        </div>
+        <div class="group-name">path_traversal (200)</div>
+      </div>
+      <div class="group">
+        <div class="group-bars">
+          <div class="gbar" data-pct="0" style="background:var(--border-strong)"><span class="gval">0%</span></div>
+          <div class="gbar" data-pct="100" style="background:var(--accent)"><span class="gval">100%</span></div>
+          <div class="gbar" data-pct="100" style="background:var(--warning)"><span class="gval">100%</span></div>
+          <div class="gbar" data-pct="100" style="background:var(--critical)"><span class="gval">100%</span></div>
+        </div>
+        <div class="group-name">cmdi (200)</div>
+      </div>
+      <div class="group">
+        <div class="group-bars">
+          <div class="gbar" data-pct="0" style="background:var(--border-strong)"><span class="gval">0%</span></div>
+          <div class="gbar" data-pct="98.8" style="background:var(--accent)"><span class="gval">98.8%</span></div>
+          <div class="gbar" data-pct="93.2" style="background:var(--warning)"><span class="gval">93.2%</span></div>
+          <div class="gbar" data-pct="99.5" style="background:var(--critical)"><span class="gval">99.5%</span></div>
+        </div>
+        <div class="group-name">Overall (590)</div>
+      </div>
+    </div>
+
+    <div class="table-scroll" style="margin-top:2rem;">
+      <table>
+        <thead><tr><th>Category</th><th class="num">No protection</th><th class="num">logSguarDian only</th><th class="num">WAF only (PL1)</th><th class="num">Layered</th></tr></thead>
+        <tbody>
+          <tr><td>sqli</td><td class="num">0/77</td><td class="num">76/77</td><td class="num">66/77</td><td class="num">77/77</td></tr>
+          <tr><td>xss</td><td class="num">0/113</td><td class="num">110/113</td><td class="num">110/113</td><td class="num">113/113</td></tr>
+          <tr><td>path_traversal</td><td class="num">0/200</td><td class="num">197/200</td><td class="num">174/200</td><td class="num">197/200</td></tr>
+          <tr><td>cmdi</td><td class="num">0/200</td><td class="num">200/200</td><td class="num">200/200</td><td class="num">200/200</td></tr>
+          <tr><td><strong>Overall</strong></td><td class="num"><strong>0/590</strong></td><td class="num"><strong>583/590</strong></td><td class="num"><strong>550/590</strong></td><td class="num"><strong>587/590</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top:2rem;">
+      <p>Of the 40 attacks CRS (PL1) missed, attributing Config 3b's blocks by response signature shows <strong>37 were independently caught by logSguarDian</strong> after passing the WAF. Only 3 payloads passed both layers, and none are real vulnerabilities against the target app — they were non-functional generic LFI strings with no <code>../</code> sequence.</p>
+    </div>
+
+    <h3 style="margin-top:2.5rem;">Zero-protection baseline</h3>
+    <p class="lede">Against the same app with no WAF and no middleware, all 6 tested attack vectors fully compromised it: SQLi auth bypass via <code>' OR '1'='1' --</code> (full admin session), SQLi UNION exfiltration (plaintext credential dump including admin/admin123), stored XSS in two fields executing unescaped, path traversal reading <code>/etc/passwd</code>, and command injection running <strong>as root inside the container</strong> — unrestricted, not a scoped service account.</p>
+
+    <h3 style="margin-top:2rem;">Methodology notes</h3>
+    <p class="lede">A documented proof-of-concept in the target app's own vulnerability notes had a bug (wrong SQL column count) that was found and corrected during testing. Every result was captured against a live running instance and cross-checked against logSguarDian's own event log. CRS PL1 was chosen deliberately as the realistic default for the target audience, not weakened to flatter the comparison.</p>
+  </div>
+</section>
+
+<section id="dataset">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Dataset</span>
+      <h2>~380,000 labeled requests, from 9 sources</h2>
+      <p class="lede">Licenses were audited per-source. Two sources have no clear license from the original publisher — logSguarDian does not redistribute their raw data, only derived 73-feature vectors, and we're stating that plainly rather than glossing over it.</p>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Source</th><th>License</th><th class="num">Records</th><th>Classes</th></tr></thead>
+        <tbody>
+          <tr><td>SR-BH 2020 / CAPEC multilabel</td><td>CC0-1.0</td><td class="num">289,287</td><td>sqli, xss, path_traversal, cmdi</td></tr>
+          <tr><td>modsec-learn</td><td>MIT</td><td class="num">539,074</td><td>sqli, benign</td></tr>
+          <tr><td>OWASP ModSec honeypot logs</td><td>CC BY 4.0</td><td class="num">56,399</td><td>sqli, xss, path_traversal, cmdi</td></tr>
+          <tr><td>Payloads.csv (Shahane)</td><td>CC BY 4.0</td><td class="num">21,624</td><td>xss, benign</td></tr>
+          <tr><td>payload_full.csv (Thakur)</td><td>MIT</td><td class="num">31,067</td><td>all 5 (cmdi scarce, 89 rows)</td></tr>
+          <tr><td>XSS_dataset.csv (Shah)</td><td>Unspecified — no raw redistribution</td><td class="num">13,570</td><td>xss, benign</td></tr>
+          <tr><td>command injection.csv (Pawase)</td><td>Unspecified — no raw redistribution</td><td class="num">2,105</td><td>cmdi, benign</td></tr>
+          <tr><td>omurugur Path Traversal Payload List</td><td>MIT</td><td class="num">43,137</td><td>path_traversal</td></tr>
+          <tr><td>russellmitchell (AIT-LDSv2)</td><td>CC-BY-NC-SA-4.0</td><td class="num">excluded</td><td>role labels ≠ attack type; NC clause</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="chart-sub" style="margin-top:0.8rem;">v9 added 2,470 real command-injection payloads from SecLists' <code>command-injection-commix.txt</code> and PayloadsAllTheThings, verified at 0% near-duplicate overlap (MinHash, threshold 0.70) with the existing corpus — a 44.5% growth in the cmdi class that measurably improved detection (see <a href="limitations.html#cmdi">limitation #1</a>).</p>
+
+    <div class="callout warn">
+      <p><strong>Generalization is bounded to the styles in this corpus.</strong> A leave-one-source-out test found 0 of 9 sources reach macro F1 ≥ 0.80 when held out entirely; only <code>command_injection</code> clears 0.60 (0.7762). A genuinely novel attack or benign style — one unlike anything in these 9 sources — should be expected to degrade detection meaningfully. Full breakdown in <a href="limitations.html#loso">limitation #4</a>.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <a href="index.html" class="brand"><span class="mark">◆</span> logSguarDian</a>
+        <p style="margin-top:0.9rem;max-width:32ch;color:var(--text-muted)">Real-time attack detection for Node.js/Express, built as a thesis at Universidad del Valle de Guatemala.</p>
+      </div>
+      <div>
+        <h4>Project</h4>
+        <ul>
+          <li><a href="evaluation.html">Evaluation</a></li>
+          <li><a href="limitations.html">Limitations</a></li>
+          <li><a href="docs.html">Docs &amp; CLI</a></li>
+          <li><a href="about.html">About &amp; authors</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Links</h4>
+        <ul>
+          <li><a href="https://github.com/xtsebas/logSguarDian" target="_blank" rel="noopener">GitHub repository</a></li>
+          <li><a href="https://www.npmjs.com/package/logsguardian" target="_blank" rel="noopener">npm package</a></li>
+          <li><a href="https://github.com/xtsebas/logSguarDian/blob/main/LICENSE" target="_blank" rel="noopener">MIT license</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Sebastián Huertas &amp; Diego Valenzuela — Universidad del Valle de Guatemala</span>
+      <span>logsguardian@0.1.0</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>About the Thesis</title>
+<meta name="description" content="logSguarDian is a thesis project at Universidad del Valle de Guatemala by Sebastián Huertas and Diego Valenzuela — the story, the team, and the project's current status." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230e8f73%22/><path d=%22M30 52 L45 67 L72 34%22 stroke=%22%23f4f6f5%22 stroke-width=%229%22 fill=%22none%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>" />
+<link rel="stylesheet" href="css/tokens.css" />
+<link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="wrap">
+    <a href="index.html" class="brand"><span class="mark">◆</span> logSguarDian</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Product</a></li>
+      <li><a href="evaluation.html">Evaluation</a></li>
+      <li><a href="limitations.html">Limitations</a></li>
+      <li><a href="docs.html">Docs</a></li>
+      <li><a href="about.html" aria-current="page">About</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a class="btn btn-ghost btn-text" href="https://github.com/xtsebas/logSguarDian" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn btn-primary" href="https://www.npmjs.com/package/logsguardian" target="_blank" rel="noopener">npm install</a>
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+        <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<header class="wrap" style="padding:3.5rem 0 1rem;">
+  <span class="eyebrow">About</span>
+  <h1 style="font-size:var(--step-3)">A thesis, built to be actually installed</h1>
+  <p class="lede">logSguarDian is a graduation thesis project at Universidad del Valle de Guatemala (2026) — built not just to be defended, but to be a real npm package a small team could put in front of production traffic.</p>
+</header>
+
+<section class="tight">
+  <div class="wrap">
+    <div class="grid-2">
+      <div class="card">
+        <h4>Sebastián Huertas</h4>
+        <p>Cybersecurity integration, dataset verification, library architecture and structure, testing and core logic.</p>
+      </div>
+      <div class="card">
+        <h4>Diego Valenzuela</h4>
+        <p>AI/ML model integration, feature engineering and model training, library architecture and structure, testing and core logic.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bg-sunken">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Status</span>
+      <h2>Where the project actually stands</h2>
+    </div>
+    <div class="callout">
+      <p><strong>Published:</strong> <code>logsguardian@0.1.0</code> is live on npm. Detection, the CLI, and the evaluation suite are functionally complete. The repository is in a documentation and packaging polish pass rather than active feature development.</p>
+    </div>
+    <p class="lede">The model versions currently shipping are <strong>rf_v10 / if_v9</strong>, running on a worker-pool architecture (1 dedicated RF worker, a round-robin pool of 2 IF workers). 68/68 extractor tests, 147/147 core middleware tests, and 113/113 CLI tests pass. A handful of middleware tests depend on real <code>setTimeout</code> margins and can flake under full parallel CI load — always pass individually, tracked as a known CI quirk rather than a product defect.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Contributing</span>
+      <h2>The best outcome right now is someone finding what we got wrong</h2>
+      <p class="lede">This is a research project with real, stated limitations — not a finished commercial product. If you run WAFs or RASP tooling in production, or want to poke holes in the methodology, that's exactly the feedback that's useful. Open an issue, or read <a href="limitations.html">what we already know is imperfect</a> before reporting a duplicate.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card">
+        <h4>Source</h4>
+        <p style="margin-bottom:0"><a href="https://github.com/xtsebas/logSguarDian" target="_blank" rel="noopener">github.com/xtsebas/logSguarDian</a> — pnpm monorepo, MIT licensed.</p>
+      </div>
+      <div class="card">
+        <h4>Package</h4>
+        <p style="margin-bottom:0"><a href="https://www.npmjs.com/package/logsguardian" target="_blank" rel="noopener">npmjs.com/package/logsguardian</a></p>
+      </div>
+      <div class="card">
+        <h4>License</h4>
+        <p style="margin-bottom:0">MIT — see <a href="https://github.com/xtsebas/logSguarDian/blob/main/LICENSE" target="_blank" rel="noopener">LICENSE</a> in the repo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <a href="index.html" class="brand"><span class="mark">◆</span> logSguarDian</a>
+        <p style="margin-top:0.9rem;max-width:32ch;color:var(--text-muted)">Real-time attack detection for Node.js/Express, built as a thesis at Universidad del Valle de Guatemala.</p>
+      </div>
+      <div>
+        <h4>Project</h4>
+        <ul>
+          <li><a href="evaluation.html">Evaluation</a></li>
+          <li><a href="limitations.html">Limitations</a></li>
+          <li><a href="docs.html">Docs &amp; CLI</a></li>
+          <li><a href="about.html">About &amp; authors</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Links</h4>
+        <ul>
+          <li><a href="https://github.com/xtsebas/logSguarDian" target="_blank" rel="noopener">GitHub repository</a></li>
+          <li><a href="https://www.npmjs.com/package/logsguardian" target="_blank" rel="noopener">npm package</a></li>
+          <li><a href="https://github.com/xtsebas/logSguarDian/blob/main/LICENSE" target="_blank" rel="noopener">MIT license</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Sebastián Huertas &amp; Diego Valenzuela — Universidad del Valle de Guatemala</span>
+      <span>logsguardian@0.1.0</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/app.js"></script>
+</body>
+</html>

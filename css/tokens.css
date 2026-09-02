@@ -1,0 +1,113 @@
+/* ============================================================
+   logSguarDian — design tokens
+   Palette rationale: teal/crimson lifted from the quetzal
+   (Guatemala's national bird — emerald body, crimson breast),
+   the same country the "Why" section is written for. Neutrals
+   carry a faint teal bias rather than pure grey.
+   ============================================================ */
+
+:root {
+  /* surfaces */
+  --bg: #f4f6f5;
+  --surface: #ffffff;
+  --surface-sunken: #eceeec;
+  --border: #d8ded9;
+  --border-strong: #b9c2bc;
+
+  /* text */
+  --text: #10201b;
+  --text-muted: #4b5b57;
+  --text-faint: #7c8b86;
+  --text-on-accent: #f4f6f5;
+
+  /* brand */
+  --accent: #0e8f73;
+  --accent-strong: #086b56;
+  --accent-soft: #dcf0ea;
+  --critical: #b8382f;
+  --critical-soft: #f6e2e0;
+  --warning: #c97a1a;
+  --warning-soft: #f5e6d1;
+
+  /* categorical — attack classes (validated: CVD ΔE ≥ 8, normal-vision ≥ 15) */
+  --cls-sqli: #2f7db6;
+  --cls-xss: #a87415;
+  --cls-path: #7c5cbf;
+  --cls-cmdi: #d1573b;
+
+  /* type */
+  --font-display: "IBM Plex Serif", "Iowan Old Style", ui-serif, Georgia, serif;
+  --font-body: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* scale */
+  --step--1: clamp(0.83rem, 0.8rem + 0.15vw, 0.9rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --step-1: clamp(1.2rem, 1.12rem + 0.4vw, 1.4rem);
+  --step-2: clamp(1.5rem, 1.35rem + 0.75vw, 1.9rem);
+  --step-3: clamp(1.9rem, 1.6rem + 1.5vw, 2.6rem);
+  --step-4: clamp(2.4rem, 1.9rem + 2.5vw, 3.6rem);
+
+  --radius-s: 4px;
+  --radius-m: 8px;
+  --shadow-card: 0 1px 2px rgba(16, 32, 27, 0.06), 0 4px 16px rgba(16, 32, 27, 0.05);
+  --max-w: 1100px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1412;
+    --surface: #141c1a;
+    --surface-sunken: #101815;
+    --border: #26332f;
+    --border-strong: #37473f;
+
+    --text: #edefec;
+    --text-muted: #9fb0aa;
+    --text-faint: #6d7d77;
+    --text-on-accent: #06120f;
+
+    --accent: #35c79e;
+    --accent-strong: #5fe0b8;
+    --accent-soft: #16332b;
+    --critical: #e2685c;
+    --critical-soft: #3a1e1c;
+    --warning: #e0a23a;
+    --warning-soft: #3a2c14;
+
+    --cls-sqli: #4a93cc;
+    --cls-xss: #b57f1e;
+    --cls-path: #9478d6;
+    --cls-cmdi: #d66a4c;
+
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 20px rgba(0, 0, 0, 0.35);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0d1412;
+  --surface: #141c1a;
+  --surface-sunken: #101815;
+  --border: #26332f;
+  --border-strong: #37473f;
+
+  --text: #edefec;
+  --text-muted: #9fb0aa;
+  --text-faint: #6d7d77;
+  --text-on-accent: #06120f;
+
+  --accent: #35c79e;
+  --accent-strong: #5fe0b8;
+  --accent-soft: #16332b;
+  --critical: #e2685c;
+  --critical-soft: #3a1e1c;
+  --warning: #e0a23a;
+  --warning-soft: #3a2c14;
+
+  --cls-sqli: #4a93cc;
+  --cls-xss: #b57f1e;
+  --cls-path: #9478d6;
+  --cls-cmdi: #d66a4c;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 20px rgba(0, 0, 0, 0.35);
+}
