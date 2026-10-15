@@ -24,7 +24,7 @@
     <div class="nav-cta">
       <a class="btn btn-ghost btn-text" href="https://github.com/logSguarDian2026/logSguarDian" target="_blank" rel="noopener">GitHub</a>
       <a class="btn btn-primary" href="https://www.npmjs.com/package/logsguardian" target="_blank" rel="noopener">npm install</a>
-      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+      <button type="button" class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
         <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
         <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
       </button>
@@ -162,7 +162,7 @@ else:                                           verdict = 'pass'</code></pre>
 };</code></pre>
     <div class="table-scroll">
       <table>
-        <thead><tr><th>Field</th><th>Type</th><th>Default</th><th class="wrap-cell">Notes</th></tr></thead>
+        <thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Default</th><th scope="col" class="wrap-cell">Notes</th></tr></thead>
         <tbody>
           <tr><td>mode</td><td>'block' | 'monitor'</td><td>'block'</td><td class="wrap-cell">monitor logs what would have been blocked and never blocks</td></tr>
           <tr><td>threshold</td><td>number 0–1</td><td>0.35</td><td class="wrap-cell">lower catches more attacks and produces more false positives</td></tr>
@@ -186,7 +186,7 @@ else:                                           verdict = 'pass'</code></pre>
     </div>
     <div class="table-scroll">
       <table>
-        <thead><tr><th>Group</th><th>Commands</th></tr></thead>
+        <thead><tr><th scope="col">Group</th><th scope="col">Commands</th></tr></thead>
         <tbody>
           <tr><td><code>config</code></td><td class="wrap-cell"><code>init</code>, <code>show</code>, <code>set</code>, <code>validate</code></td></tr>
           <tr><td><code>attacks</code></td><td class="wrap-cell"><code>list</code>, <code>summary</code>, <code>inspect</code></td></tr>

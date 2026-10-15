@@ -24,7 +24,7 @@
     <div class="nav-cta">
       <a class="btn btn-ghost btn-text" href="https://github.com/logSguarDian2026/logSguarDian" target="_blank" rel="noopener">GitHub</a>
       <a class="btn btn-primary" href="https://www.npmjs.com/package/logsguardian" target="_blank" rel="noopener">npm install</a>
-      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+      <button type="button" class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
         <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
         <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
       </button>
@@ -46,7 +46,7 @@
     </div>
     <div class="table-scroll">
       <table>
-        <thead><tr><th>Pair</th><th>Models</th><th>Where it was used</th></tr></thead>
+        <thead><tr><th scope="col">Pair</th><th scope="col">Models</th><th scope="col">Where it was used</th></tr></thead>
         <tbody>
           <tr><td>A</td><td><code>rf_v10</code> / <code>if_v9</code></td><td>npm <code>logsguardian@0.1.0</code>; Config 2, 3a and 3b on the 590-payload corpus; Round 5 comparison column</td></tr>
           <tr><td>B</td><td><code>rf_v11</code> / <code>if_v10</code>, first build (30 Aug 2026)</td><td>Linux latency, memory, and CPU measurements</td></tr>
@@ -96,7 +96,7 @@
 
     <div class="table-scroll">
       <table>
-        <thead><tr><th>Class</th><th class="num">Precision</th><th class="num">Recall</th><th class="num">F1</th><th class="num">Support</th><th class="num">AUC-ROC</th></tr></thead>
+        <thead><tr><th scope="col">Class</th><th scope="col" class="num">Precision</th><th scope="col" class="num">Recall</th><th scope="col" class="num">F1</th><th scope="col" class="num">Support</th><th scope="col" class="num">AUC-ROC</th></tr></thead>
         <tbody>
           <tr><td>benign</td><td class="num">0.9984</td><td class="num">0.9985</td><td class="num">0.9984</td><td class="num">14,886</td><td class="num">0.99998</td></tr>
           <tr><td>cmdi</td><td class="num">0.9015</td><td class="num">0.9475</td><td class="num">0.9239</td><td class="num">1,468</td><td class="num">0.99901</td></tr>
@@ -120,7 +120,7 @@
     </div>
     <div class="table-scroll">
       <table>
-        <thead><tr><th>Metric</th><th class="num">Value</th></tr></thead>
+        <thead><tr><th scope="col">Metric</th><th scope="col" class="num">Value</th></tr></thead>
         <tbody>
           <tr><td>Recall, global</td><td class="num">0.9125</td></tr>
           <tr><td>False positive rate</td><td class="num">0.0546</td></tr>
@@ -142,7 +142,7 @@
     </div>
     <div class="table-scroll">
       <table>
-        <thead><tr><th>Model</th><th>Compared quantity</th><th class="num">Max difference</th></tr></thead>
+        <thead><tr><th scope="col">Model</th><th scope="col">Compared quantity</th><th scope="col" class="num">Max difference</th></tr></thead>
         <tbody>
           <tr><td>Random Forest (<code>rf_v11</code>)</td><td>Per-class probability</td><td class="num">1.01 × 10⁻⁷</td></tr>
           <tr><td>Isolation Forest (<code>if_v10</code>)</td><td>Anomaly score</td><td class="num">2.42 × 10⁻⁷</td></tr>
@@ -167,7 +167,7 @@
     <h3 style="margin-top:2rem;">Middleware overhead, pair B, Linux runner</h3>
     <div class="table-scroll">
       <table>
-        <thead><tr><th>Scenario</th><th class="num">p95 without middleware (ms)</th><th class="num">p95 with middleware (ms)</th><th class="num">Δp95 absolute (ms)</th><th class="num">Δp95 relative</th><th class="num">Timeouts</th></tr></thead>
+        <thead><tr><th scope="col">Scenario</th><th scope="col" class="num">p95 without middleware (ms)</th><th scope="col" class="num">p95 with middleware (ms)</th><th scope="col" class="num">Δp95 absolute (ms)</th><th scope="col" class="num">Δp95 relative</th><th scope="col" class="num">Timeouts</th></tr></thead>
         <tbody>
           <tr><td>Normal, benign navigation</td><td class="num">2.49</td><td class="num">14.57</td><td class="num">12.08 — met (≤15)</td><td class="num">+485.1%</td><td class="num">0</td></tr>
           <tr><td>Attack, benign plus concurrent payloads</td><td class="num">4.62</td><td class="num">17.47</td><td class="num">12.85 — met (≤15)</td><td class="num">+278.1%</td><td class="num">0</td></tr>
@@ -180,7 +180,7 @@
     <h3 style="margin-top:2rem;">Memory and CPU, same run</h3>
     <div class="table-scroll">
       <table>
-        <thead><tr><th>Scenario</th><th class="num">Memory baseline → active (MiB)</th><th class="num">Δ memory (MiB)</th><th class="num">CPU baseline → active (% of one core)</th><th class="num">Δ CPU relative</th></tr></thead>
+        <thead><tr><th scope="col">Scenario</th><th scope="col" class="num">Memory baseline → active (MiB)</th><th scope="col" class="num">Δ memory (MiB)</th><th scope="col" class="num">CPU baseline → active (% of one core)</th><th scope="col" class="num">Δ CPU relative</th></tr></thead>
         <tbody>
           <tr><td>Attack</td><td class="num">63.2 → 394.8</td><td class="num">331.9</td><td class="num">16.1 → 101.3</td><td class="num">+529.6%</td></tr>
           <tr><td>Normal</td><td class="num">65.2 → 397.5</td><td class="num">332.0</td><td class="num">14.5 → 103.3</td><td class="num">+614.4%</td></tr>
@@ -243,7 +243,7 @@
 
     <div class="table-scroll" style="margin-top:1.5rem;">
       <table>
-        <thead><tr><th>Category</th><th class="num">No protection</th><th class="num">logSguarDian only</th><th class="num">WAF only (PL1)</th><th class="num">Layered</th></tr></thead>
+        <thead><tr><th scope="col">Category</th><th scope="col" class="num">No protection</th><th scope="col" class="num">logSguarDian only</th><th scope="col" class="num">WAF only (PL1)</th><th scope="col" class="num">Layered</th></tr></thead>
         <tbody>
           <tr><td>sqli (77)</td><td class="num">0/77</td><td class="num">76/77 (98.7%)</td><td class="num">66/77 (85.7%)</td><td class="num">77/77 (100%)</td></tr>
           <tr><td>xss (113)</td><td class="num">0/113</td><td class="num">110/113 (97.3%)</td><td class="num">110/113 (97.3%)</td><td class="num">113/113 (100%)</td></tr>
@@ -276,7 +276,7 @@
 
     <div class="table-scroll">
       <table>
-        <thead><tr><th>Category</th><th class="num">Pair C (0.1.1 model)</th><th class="num">Wilson 95% CI</th><th class="num">Pair A</th><th class="num">Wilson 95% CI</th></tr></thead>
+        <thead><tr><th scope="col">Category</th><th scope="col" class="num">Pair C (0.1.1 model)</th><th scope="col" class="num">Wilson 95% CI</th><th scope="col" class="num">Pair A</th><th scope="col" class="num">Wilson 95% CI</th></tr></thead>
         <tbody>
           <tr><td>sqli</td><td class="num">199/200 (99.5%)</td><td class="num">97.2–99.9%</td><td class="num">200/200 (100.0%)</td><td class="num">98.1–100.0%</td></tr>
           <tr><td>path_traversal</td><td class="num">190/200 (95.0%)</td><td class="num">91.0–97.3%</td><td class="num">170/200 (85.0%)</td><td class="num">79.4–89.3%</td></tr>
@@ -306,7 +306,7 @@
     </div>
     <div class="table-scroll">
       <table>
-        <thead><tr><th>Application</th><th>Mode</th><th>Measurement</th><th class="num">Benign requests blocked</th></tr></thead>
+        <thead><tr><th scope="col">Application</th><th scope="col">Mode</th><th scope="col">Measurement</th><th scope="col" class="num">Benign requests blocked</th></tr></thead>
         <tbody>
           <tr><td>OWASP Juice Shop (local copy, pair C)</td><td>monitor</td><td>Browser User-Agent, 312 requests</td><td class="num">303/312 (97.1%)</td></tr>
           <tr><td>OWASP Juice Shop (local copy, pair C)</td><td>monitor</td><td>curl User-Agent, 312 requests</td><td class="num">123/312 (39.4%)</td></tr>
