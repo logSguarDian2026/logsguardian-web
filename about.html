@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>About the Thesis</title>
-<meta name="description" content="logSguarDian is a thesis project at Universidad del Valle de Guatemala by Sebastián Huertas and Diego Valenzuela — the story, the team, and the project's current status." />
+<meta name="description" content="logSguarDian is a thesis project at Universidad del Valle de Guatemala (2026): the team, the status of the published package, the use of AI tools, and the exploratory MLOps pipeline." />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230e8f73%22/><path d=%22M30 52 L45 67 L72 34%22 stroke=%22%23f4f6f5%22 stroke-width=%229%22 fill=%22none%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>" />
 <link rel="stylesheet" href="css/tokens.css" />
 <link rel="stylesheet" href="css/main.css" />
@@ -34,21 +34,25 @@
 
 <header class="wrap" style="padding:3.5rem 0 1rem;">
   <span class="eyebrow">About</span>
-  <h1 style="font-size:var(--step-3)">A thesis, built to be actually installed</h1>
-  <p class="lede">logSguarDian is a graduation thesis project at Universidad del Valle de Guatemala (2026) — built not just to be defended, but to be a real npm package a small team could put in front of production traffic.</p>
+  <h1 style="font-size:var(--step-3)">A thesis, built to be installed</h1>
+  <p class="lede">logSguarDian is a graduation thesis at Universidad del Valle de Guatemala (2026). It was built as an npm package that a small team could run in front of production traffic, and it was evaluated against criteria that it does not fully meet.</p>
 </header>
 
 <section class="tight">
   <div class="wrap">
     <div class="grid-2">
       <div class="card">
-        <h4>Sebastián Huertas</h4>
-        <p>Cybersecurity integration, dataset verification, library architecture and structure, testing and core logic.</p>
+        <h4>Sebastián Huertas Gómez</h4>
+        <p>Implemented the initial 72-feature extractor and its move to <code>worker_threads</code>. Also built the cybersecurity component and the npm package side of the library.</p>
       </div>
       <div class="card">
-        <h4>Diego Valenzuela</h4>
-        <p>AI/ML model integration, feature engineering and model training, library architecture and structure, testing and core logic.</p>
+        <h4>Diego Pablo Valenzuela Palacios</h4>
+        <p>Analyzed and justified each feature, defined which features do not exist at inference time, and fixed the input contract. Added four features and their corrections, and built the training, ONNX export, and retraining pipeline. Built the machine learning component.</p>
       </div>
+    </div>
+    <div class="card" style="margin-top:1.75rem;">
+      <h4>Advisors and acknowledgments</h4>
+      <p>Thesis advisor: Ing. Erick Francisco Marroquín Rodríguez. Catedrático: Ing. Bacilio Alexander Bolaños Lima. The original idea of a library that combines artificial intelligence and cybersecurity came from Ing. Wilson Iván Félix Reyna.</p>
     </div>
   </div>
 </section>
@@ -57,12 +61,46 @@
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">Status</span>
-      <h2>Where the project actually stands</h2>
+      <h2>Where the package stands</h2>
     </div>
     <div class="callout">
-      <p><strong>Published:</strong> <code>logsguardian@0.1.0</code> is live on npm. Detection, the CLI, and the evaluation suite are functionally complete. The repository is in a documentation and packaging polish pass rather than active feature development.</p>
+      <p><strong>Published:</strong> <code>logsguardian@<span data-version></span></code> was published on npm on 11 October 2026. Version 0.1.0 was published on 30 August 2026. Version <span data-version></span> contains the <code>rf_v11</code> / <code>if_v10</code> models whose metrics are reported in the thesis.</p>
     </div>
-    <p class="lede">The model versions currently shipping are <strong>rf_v10 / if_v9</strong>, running on a worker-pool architecture (1 dedicated RF worker, a round-robin pool of 2 IF workers). 68/68 extractor tests, 147/147 core middleware tests, and 113/113 CLI tests pass. A handful of middleware tests depend on real <code>setTimeout</code> margins and can flake under full parallel CI load — always pass individually, tracked as a known CI quirk rather than a product defect.</p>
+    <p class="lede" style="margin-top:1.5rem;">Tests pass in the repository: 68 extractor tests, 147 core middleware tests, and 113 CLI tests, as recorded in the repository status report of 16 August 2026. Some middleware tests depend on real timer margins and can fail under heavy parallel load.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Use of AI tools</span>
+      <h2>Statement from the thesis preface</h2>
+      <p class="lede">The following restates the thesis's declaration. The preface was written by Diego Pablo Valenzuela Palacios, author of the machine learning component.</p>
+    </div>
+    <div class="callout">
+      <p>The project, its design, and its technical decisions belong to the author. The author defined the approach, selected the models, analyzed and justified each feature, fixed the input contract, built the training, ONNX serialization, and retraining pipeline, designed the MLOps pipeline and the SHAP interpretability analysis, and decided the scope and the results reported. Claude, by Anthropic, was used as a support tool for training and analysis code, technical documentation, and drafting, through conversation and a coding agent. The author provided the content and the instructions. Claude drafted and reformulated text, converted it to LaTeX, and checked consistency across chapters. The author directed that work, reviewed the texts, checked the figures against their sources, can explain the content, and takes responsibility for the document.</p>
+    </div>
+  </div>
+</section>
+
+<section class="bg-sunken">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Exploratory work</span>
+      <h2>An MLOps pipeline, outside the evaluated objectives</h2>
+      <p class="lede">Built as separate infrastructure, not as part of the npm package or its runtime dependencies. The thesis presents it as a recommendation for teams that adopt logSguarDian at scale.</p>
+    </div>
+    <ol class="mlops-phases" style="margin:0 0 0 1.25rem;line-height:1.7">
+      <li>Telemetry collection: receives only the 76-feature vector of each classified request, never the raw payload.</li>
+      <li>Fleet simulation: several simulated sources send telemetry concurrently.</li>
+      <li>Anomaly clustering: Isolation Forest and DBSCAN run on the 63 features that the unsupervised model uses.</li>
+      <li>Human curation: a command-line interface reviews the resulting clusters.</li>
+      <li>Orchestrated retraining: unifies the curated corpus, retrains the hybrid model, and generates the ONNX artifacts.</li>
+      <li>Validation: five acceptance gates, checked in order and stopped at the first failure.</li>
+      <li>Canary deployment: a replay of the labeled test corpus, plus a bounded shadow window on live traffic.</li>
+      <li>Promotion or rollback: promotion requires zero attacks let through that production blocks, and at least 99.5% agreement on blocking decisions.</li>
+    </ol>
+    <p class="chart-sub" style="margin-top:1.25rem;">As a proof of concept, the retraining pipeline ran on 29 August 2026 with simulated telemetry: 244 events from five simulated sources and one dedicated source. It is not a production service.</p>
   </div>
 </section>
 
@@ -70,21 +108,21 @@
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">Contributing</span>
-      <h2>The best outcome right now is someone finding what we got wrong</h2>
-      <p class="lede">This is a research project with real, stated limitations — not a finished commercial product. If you run WAFs or RASP tooling in production, or want to poke holes in the methodology, that's exactly the feedback that's useful. Open an issue, or read <a href="limitations.html">what we already know is imperfect</a> before reporting a duplicate.</p>
+      <h2>The most useful feedback is a case where the library gets it wrong</h2>
+      <p class="lede">This is a research project with stated limitations, not a finished commercial product. If you run WAFs or RASP tools in production, or want to test the methodology, that feedback helps most. Read <a href="limitations.html">the known limitations</a> before reporting a duplicate.</p>
     </div>
     <div class="grid-3">
       <div class="card">
         <h4>Source</h4>
-        <p style="margin-bottom:0"><a href="https://github.com/logSguarDian2026/logSguarDian" target="_blank" rel="noopener">github.com/logSguarDian2026/logSguarDian</a> — pnpm monorepo, MIT licensed.</p>
+        <p style="margin-bottom:0"><a href="https://github.com/logSguarDian2026/logSguarDian" target="_blank" rel="noopener">github.com/logSguarDian2026/logSguarDian</a>, a pnpm monorepo under the MIT license.</p>
+      </div>
+      <div class="card">
+        <h4>Readme</h4>
+        <p style="margin-bottom:0"><a href="https://github.com/logSguarDian2026/logSguarDian/blob/main/README.md" target="_blank" rel="noopener">Repository README</a>, with installation and status.</p>
       </div>
       <div class="card">
         <h4>Package</h4>
         <p style="margin-bottom:0"><a href="https://www.npmjs.com/package/logsguardian" target="_blank" rel="noopener">npmjs.com/package/logsguardian</a></p>
-      </div>
-      <div class="card">
-        <h4>License</h4>
-        <p style="margin-bottom:0">MIT — see <a href="https://github.com/logSguarDian2026/logSguarDian/blob/main/LICENSE" target="_blank" rel="noopener">LICENSE</a> in the repo.</p>
       </div>
     </div>
   </div>
@@ -116,7 +154,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 Sebastián Huertas &amp; Diego Valenzuela — Universidad del Valle de Guatemala</span>
+      <span>© 2026 Sebastián Huertas Gómez &amp; Diego Pablo Valenzuela Palacios — Universidad del Valle de Guatemala</span>
       <span>logsguardian@<span data-version></span></span>
     </div>
   </div>
