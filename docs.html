@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Architecture &amp; CLI Reference</title>
-<meta name="description" content="How logSguarDian works: the feature-extraction and decision-policy pipeline, config options, and the full CLI reference for config, attacks, endpoints, and webhooks." />
+<meta name="description" content="How logSguarDian works: the feature extraction and decision-policy pipeline, the middleware options, and the CLI reference for config, attacks, endpoints, and webhooks." />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230e8f73%22/><path d=%22M30 52 L45 67 L72 34%22 stroke=%22%23f4f6f5%22 stroke-width=%229%22 fill=%22none%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>" />
 <link rel="stylesheet" href="css/tokens.css" />
 <link rel="stylesheet" href="css/main.css" />
@@ -22,9 +22,9 @@
       <li><a href="about.html">About</a></li>
     </ul>
     <div class="nav-cta">
-      <a class="btn btn-ghost btn-text" href="https://github.com/xtsebas/logSguarDian" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn btn-ghost btn-text" href="https://github.com/logSguarDian2026/logSguarDian" target="_blank" rel="noopener">GitHub</a>
       <a class="btn btn-primary" href="https://www.npmjs.com/package/logsguardian" target="_blank" rel="noopener">npm install</a>
-      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+      <button type="button" class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
         <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
         <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
       </button>
@@ -35,7 +35,7 @@
 <header class="wrap" style="padding:3.5rem 0 1rem;">
   <span class="eyebrow">Docs</span>
   <h1 style="font-size:var(--step-3)">Architecture, config, and the CLI</h1>
-  <p class="lede">Everything you need to install, configure, and operate logSguarDian — plus the pipeline that decides every verdict.</p>
+  <p class="lede">How to install and configure logSguarDian, the pipeline that decides every verdict, and the CLI reference. The package version is <span data-version>0.1.1</span>.</p>
 </header>
 
 <section class="tight">
@@ -46,7 +46,7 @@
     </div>
     <pre><code>npm install logsguardian
 npx logsguardian config init</code></pre>
-    <p>This writes <code>logsguardian.config.js</code> in the current directory. Mount the middleware <strong>after</strong> your body parsers — <code>express.urlencoded</code>, <code>express.json</code>, and any <code>multer</code> instance if your app accepts file uploads.</p>
+    <p>This writes <code>logsguardian.config.js</code> in the current directory. Mount the middleware <strong>after</strong> your body parsers, such as <code>express.urlencoded</code> and <code>express.json</code>, and after any <code>multer</code> instance if your app accepts file uploads.</p>
     <pre><code>const express = require('express');
 const { logsguardian } = require('logsguardian');
 const config = require('./logsguardian.config.js');
@@ -55,9 +55,10 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(logsguardian(config));</code></pre>
-    <p>Every request past that point is inspected. Attacks get an HTTP 403; everything else is forwarded unchanged. Requires Node.js ≥ 20 and Express 4 or 5.</p>
+    <p>Every request past that point is inspected. Attacks get an HTTP 403, and everything else is forwarded unchanged. Requires Node.js 20 or later, and Express 4 (4.18 or later) or Express 5.</p>
+    <p>Start in <code>mode: 'monitor'</code> to see what would be blocked before you turn on enforcement.</p>
     <div class="callout warn">
-      <p><strong>Docker note:</strong> <code>onnxruntime-node</code> requires glibc. Alpine images (musl) silently fail to load the native binary, and the worker-spawn try/catch swallows the error — meaning 100% silent fail-open with no visible warning. Use <code>node:20-slim</code>, not <code>-alpine</code>.</p>
+      <p><strong>Native binary:</strong> <code>onnxruntime-node</code> requires glibc. Alpine images use musl, so the native binary does not load there. Use a glibc-based image such as <code>node:20-slim</code>.</p>
     </div>
   </div>
 </section>
@@ -67,7 +68,7 @@ app.use(logsguardian(config));</code></pre>
     <div class="section-head">
       <span class="eyebrow">Architecture</span>
       <h2>Request in, verdict out</h2>
-      <p class="lede">Feature extraction happens once, inside worker threads — not on the main thread — and produces a 73-feature vector. RF uses 67 of them; IF uses 61 (6 fewer: features confirmed zero/near-zero variance on benign traffic). 6 features are excluded from both models entirely: <code>status_code</code> (unknown at intercept time) and five temporal features that need cross-request state the extractor doesn't keep.</p>
+      <p class="lede">Feature extraction runs once per request and produces a 76-feature vector. Random Forest uses 69 of them and Isolation Forest uses 63. Random Forest excludes seven features: <code>status_code</code>, which is unknown when the middleware intercepts the request; the five temporal features, which need state the extractor does not keep; and <code>non_json_quote_count</code>. Isolation Forest also drops six features that have zero or near-zero variance on benign traffic.</p>
     </div>
 
     <div class="pipeline">
@@ -86,19 +87,19 @@ app.use(logsguardian(config));</code></pre>
 
         <rect class="box box-accent" x="190" y="150" width="170" height="64" rx="6"/>
         <text x="275" y="176" text-anchor="middle" font-size="13">Feature extractor</text>
-        <text x="275" y="196" text-anchor="middle" font-size="11" class="muted">73 canonical features</text>
+        <text x="275" y="196" text-anchor="middle" font-size="11" class="muted">76 features</text>
 
         <rect class="box" x="430" y="60" width="160" height="64" rx="6"/>
         <text x="510" y="86" text-anchor="middle" font-size="13">RF worker</text>
-        <text x="510" y="104" text-anchor="middle" font-size="11" class="muted">67 features · blocks</text>
+        <text x="510" y="104" text-anchor="middle" font-size="11" class="muted">69 features · blocks</text>
 
         <rect class="box" x="430" y="250" width="160" height="64" rx="6"/>
         <text x="510" y="276" text-anchor="middle" font-size="13">IF worker pool ×2</text>
-        <text x="510" y="294" text-anchor="middle" font-size="11" class="muted">61 features · logs only</text>
+        <text x="510" y="294" text-anchor="middle" font-size="11" class="muted">63 features · logs only</text>
 
         <rect class="box box-accent" x="650" y="150" width="170" height="64" rx="6"/>
         <text x="735" y="176" text-anchor="middle" font-size="13">Decision policy</text>
-        <text x="735" y="196" text-anchor="middle" font-size="11" class="muted">threshold = 0.35</text>
+        <text x="735" y="196" text-anchor="middle" font-size="11" class="muted">RF threshold = 0.35</text>
 
         <rect class="box box-critical" x="875" y="18" width="105" height="46" rx="6"/>
         <text x="927" y="46" text-anchor="middle" font-size="12">block · 403</text>
@@ -128,10 +129,10 @@ app.use(logsguardian(config));</code></pre>
       </svg>
     </div>
 
-    <h3 style="margin-top:2rem;">Decision policy, exactly as shipped</h3>
+    <h3 style="margin-top:2rem;">Decision policy</h3>
     <pre><code>rf_classes   = ['benign', 'cmdi', 'path_traversal', 'sqli', 'xss']
 RF_THRESHOLD = 0.35
-IF_THRESHOLD = 0.002486040118540811   // if_v9
+IF_THRESHOLD = 0.004205941820353609   // if_v10, frozen in model metadata
 
 predicted_class = rf_classes[argmax(rf_probs)]
 confidence      = max(rf_probs)
@@ -141,7 +142,7 @@ is_anomaly      = if_score &lt; IF_THRESHOLD
 if is_attack AND confidence &gt;= RF_THRESHOLD:  verdict = 'block'
 else if is_anomaly:                            verdict = 'pass_anomaly'
 else:                                           verdict = 'pass'</code></pre>
-    <p>Bodies and query strings are serialized with <code>URLSearchParams</code>, not <code>JSON.stringify</code> — chosen specifically to avoid introducing structural characters (<code>{ } : "</code>) that caused false positives on plain form POSTs. A JSON-encoded login body once scored <code>xss @ 0.40</code>; the same body URL-encoded scored <code>benign @ 0.90</code>.</p>
+    <p>The middleware rebuilds the query string with <code>URLSearchParams</code> before extracting features. The thesis reports that this changes some feature values for the same request, and that its test metrics do not include that effect.</p>
   </div>
 </section>
 
@@ -149,30 +150,30 @@ else:                                           verdict = 'pass'</code></pre>
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">Configuration</span>
-      <h2>Every option in <code>logsguardian.config.js</code></h2>
+      <h2>Options in <code>logsguardian.config.js</code></h2>
     </div>
     <pre><code>module.exports = {
-  mode: 'block',        // 'block' (403 on attacks) or 'monitor' (log only, never blocks)
-  threshold: 0.35,       // RF confidence above which a request is blocked
-  model: 'hybrid',        // 'rf' (blocking only), 'if' (anomaly logging only), or 'hybrid'
-  timeoutMs: 50,           // fail-open timeout — if RF doesn't answer in time, request passes
-  dbPath: './logsguardian.db',   // SQLite event log + webhook registry
-  webhookUrl: undefined,          // optional static webhook, called on block/anomaly
+  mode: 'block',               // 'block' (403 on attacks) or 'monitor' (log only)
+  threshold: 0.35,             // RF confidence at or above which a request is blocked
+  model: 'hybrid',             // 'rf', 'if', or 'hybrid'
+  timeoutMs: 50,               // fail-open timeout for the RF worker
+  dbPath: './logsguardian.db', // SQLite event log and webhook registry
+  webhookUrl: undefined,       // optional static webhook, called on block or anomaly
 };</code></pre>
     <div class="table-scroll">
       <table>
-        <thead><tr><th>Field</th><th>Type</th><th>Default</th><th class="wrap-cell">Notes</th></tr></thead>
+        <thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Default</th><th scope="col" class="wrap-cell">Notes</th></tr></thead>
         <tbody>
-          <tr><td>mode</td><td>'block' | 'monitor'</td><td>'block'</td><td class="wrap-cell">monitor is a dark-launch mode — logs what would have blocked, never blocks</td></tr>
-          <tr><td>threshold</td><td>number 0–1</td><td>0.35</td><td class="wrap-cell">lower = more attacks caught, more false positives</td></tr>
-          <tr><td>model</td><td>'rf' | 'if' | 'hybrid'</td><td>'hybrid'</td><td class="wrap-cell">which model(s) run</td></tr>
-          <tr><td>timeoutMs</td><td>number</td><td>50</td><td class="wrap-cell">RF only — IF is never on the blocking path</td></tr>
-          <tr><td>dbPath</td><td>string</td><td>./logsguardian.db</td><td class="wrap-cell">use <code>:memory:</code> in tests</td></tr>
-          <tr><td>webhookUrl</td><td>string</td><td>unset</td><td class="wrap-cell">single static webhook; HTTPS not enforced here (unlike CLI-registered ones)</td></tr>
+          <tr><td>mode</td><td>'block' | 'monitor'</td><td>'block'</td><td class="wrap-cell">monitor logs what would have been blocked and never blocks</td></tr>
+          <tr><td>threshold</td><td>number 0–1</td><td>0.35</td><td class="wrap-cell">lower catches more attacks and produces more false positives</td></tr>
+          <tr><td>model</td><td>'rf' | 'if' | 'hybrid'</td><td>'hybrid'</td><td class="wrap-cell">which model or models run</td></tr>
+          <tr><td>timeoutMs</td><td>number</td><td>50</td><td class="wrap-cell">applies to the RF worker; Isolation Forest is never on the blocking path</td></tr>
+          <tr><td>dbPath</td><td>string</td><td>./logsguardian.db</td><td class="wrap-cell">SQLite event log; use <code>:memory:</code> in tests</td></tr>
+          <tr><td>webhookUrl</td><td>string</td><td>unset</td><td class="wrap-cell">single static webhook, called on block or anomaly</td></tr>
+          <tr><td>modelDir</td><td>string</td><td>bundled models</td><td class="wrap-cell">directory with <code>rf.onnx</code>, <code>if.onnx</code>, and <code>parity_report.json</code></td></tr>
         </tbody>
       </table>
     </div>
-    <p style="margin-top:1rem;">Start in <code>mode: 'monitor'</code> to see what logSguarDian would have blocked before turning on enforcement.</p>
   </div>
 </section>
 
@@ -181,31 +182,32 @@ else:                                           verdict = 'pass'</code></pre>
     <div class="section-head">
       <span class="eyebrow">CLI</span>
       <h2><code>logsguardian --help</code></h2>
-      <p class="lede">14 subcommands across four groups. All except <code>config init</code> require a <code>logsguardian.config.js</code> in the current directory.</p>
+      <p class="lede">14 subcommands in four groups. All of them except <code>config init</code> need a <code>logsguardian.config.js</code> in the current directory.</p>
     </div>
     <div class="table-scroll">
       <table>
-        <thead><tr><th>Group</th><th>Commands</th></tr></thead>
+        <thead><tr><th scope="col">Group</th><th scope="col">Commands</th></tr></thead>
         <tbody>
-          <tr><td><code>config</code></td><td class="wrap-cell"><code>init</code>, <code>show [--format table|json]</code>, <code>set &lt;key&gt; &lt;value&gt;</code>, <code>validate</code></td></tr>
-          <tr><td><code>attacks</code></td><td class="wrap-cell"><code>list</code>, <code>summary [--from] [--to] [--endpoint]</code>, <code>inspect &lt;type&gt;</code> — sqli, xss, path_traversal, or cmdi</td></tr>
-          <tr><td><code>endpoints</code></td><td class="wrap-cell"><code>top [--limit]</code>, <code>profile &lt;route&gt; [--method]</code>, <code>report [--format json|csv] [--output]</code></td></tr>
-          <tr><td><code>webhooks</code></td><td class="wrap-cell"><code>add &lt;url&gt;</code> (HTTPS required), <code>remove &lt;id&gt;</code>, <code>list</code>, <code>test &lt;id&gt;</code> — no restart needed</td></tr>
+          <tr><td><code>config</code></td><td class="wrap-cell"><code>init</code>, <code>show</code>, <code>set</code>, <code>validate</code></td></tr>
+          <tr><td><code>attacks</code></td><td class="wrap-cell"><code>list</code>, <code>summary</code>, <code>inspect</code></td></tr>
+          <tr><td><code>endpoints</code></td><td class="wrap-cell"><code>top</code>, <code>profile</code>, <code>report</code></td></tr>
+          <tr><td><code>webhooks</code></td><td class="wrap-cell"><code>add</code> (HTTPS only), <code>remove</code>, <code>list</code>, <code>test</code></td></tr>
         </tbody>
       </table>
     </div>
+    <p style="margin-top:1rem;">Run <code>logsguardian &lt;group&gt; --help</code> for each command's flags.</p>
 
     <div class="grid-2" style="margin-top:2rem;">
       <div class="card">
-        <h4>Block response shape</h4>
+        <h4>Block response</h4>
         <pre style="margin:0"><code>{ "error": "Forbidden", "class": "sqli" }</code></pre>
       </div>
       <div class="card">
-        <h4>Detection event schema (SQLite)</h4>
-        <p style="margin:0" class="mono" style="font-size:0.85em">timestamp, method, path, query_string, user_agent, client_ip, verdict, predicted_class, confidence, if_score, is_anomaly, webhook_sent, elapsed_ms</p>
+        <h4>Event log (SQLite)</h4>
+        <p style="margin:0">Each detection row stores: timestamp, method, path, query_string, user_agent, client_ip, verdict, predicted_class, confidence, if_score, is_anomaly, webhook_sent, elapsed_ms.</p>
       </div>
     </div>
-    <p style="margin-top:1.5rem;">Webhooks fire a fire-and-forget POST of the detection event JSON, 3s timeout, and never affect the response on failure. A verdict can flip retroactively: a <code>pass</code> becomes <code>pass_anomaly</code> once IF's async result lands, firing a webhook at that point if one is configured.</p>
+    <p style="margin-top:1.5rem;">Webhooks send the detection event as JSON, with a 3-second timeout. A failed delivery never changes the response. Because Isolation Forest answers asynchronously, a row written as <code>pass</code> can later be updated to <code>pass_anomaly</code>.</p>
   </div>
 </section>
 
@@ -228,19 +230,20 @@ else:                                           verdict = 'pass'</code></pre>
       <div>
         <h4>Links</h4>
         <ul>
-          <li><a href="https://github.com/xtsebas/logSguarDian" target="_blank" rel="noopener">GitHub repository</a></li>
+          <li><a href="https://github.com/logSguarDian2026/logSguarDian" target="_blank" rel="noopener">GitHub repository</a></li>
           <li><a href="https://www.npmjs.com/package/logsguardian" target="_blank" rel="noopener">npm package</a></li>
-          <li><a href="https://github.com/xtsebas/logSguarDian/blob/main/LICENSE" target="_blank" rel="noopener">MIT license</a></li>
+          <li><a href="https://github.com/logSguarDian2026/logSguarDian/blob/main/LICENSE" target="_blank" rel="noopener">MIT license</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 Sebastián Huertas &amp; Diego Valenzuela — Universidad del Valle de Guatemala</span>
-      <span>logsguardian@0.1.0</span>
+      <span>© 2026 Sebastián Huertas Gómez &amp; Diego Pablo Valenzuela Palacios — Universidad del Valle de Guatemala</span>
+      <span>logsguardian@<span data-version>0.1.1</span></span>
     </div>
   </div>
 </footer>
 
+<script src="js/site-config.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

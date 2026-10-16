@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Known Limitations</title>
-<meta name="description" content="Ten documented limitations of logSguarDian, each with its root-cause investigation: command injection separability, ONNX memory expansion, dataset generalization, and more." />
+<meta name="description" content="Ten documented limitations of logSguarDian: test-set reuse, corpus overlap, User-Agent dependence, labeling confusion between cmdi and sqli, and unmet memory, CPU, and volume criteria." />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230e8f73%22/><path d=%22M30 52 L45 67 L72 34%22 stroke=%22%23f4f6f5%22 stroke-width=%229%22 fill=%22none%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>" />
 <link rel="stylesheet" href="css/tokens.css" />
 <link rel="stylesheet" href="css/main.css" />
@@ -22,9 +22,9 @@
       <li><a href="about.html">About</a></li>
     </ul>
     <div class="nav-cta">
-      <a class="btn btn-ghost btn-text" href="https://github.com/xtsebas/logSguarDian" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn btn-ghost btn-text" href="https://github.com/logSguarDian2026/logSguarDian" target="_blank" rel="noopener">GitHub</a>
       <a class="btn btn-primary" href="https://www.npmjs.com/package/logsguardian" target="_blank" rel="noopener">npm install</a>
-      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+      <button type="button" class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
         <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
         <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
       </button>
@@ -34,95 +34,100 @@
 
 <header class="wrap" style="padding:3.5rem 0 1rem;">
   <span class="eyebrow">Limitations</span>
-  <h1 style="font-size:var(--step-3)">Ten limitations, documented on purpose</h1>
-  <p class="lede">Every entry below comes from <code>docs/limitations.md</code> in the repo — a root-cause investigation, not a disclaimer. Where something was fixed, we say so. Where it wasn't, we say why we left it alone.</p>
-  <div class="pill-row" style="margin-top:1rem;">
-    <span class="pill">4 open / accepted</span>
-    <span class="pill">3 resolved</span>
-    <span class="pill">3 investigated, not fixed</span>
-  </div>
+  <h1 style="font-size:var(--step-3)">Ten limitations, stated with their evidence</h1>
+  <p class="lede">Each limitation below comes from the thesis's results and discussion chapters, or from its annexes. Where a result contradicts an earlier claim, we say so. The thesis is the reference, not the repository's internal notes.</p>
 </header>
 
 <section class="tight">
   <div class="wrap">
 
-    <div class="limitation" id="cmdi">
+    <div class="limitation" id="evaluation-reuse">
       <div class="idx">01</div>
       <div>
-        <h4>Command injection is the hardest class to separate <span class="status status-accepted">accepted tradeoff</span></h4>
-        <p>cmdi shares structural features — separators, binary names, redirection operators — with benign filesystem paths and path traversal, and isn't linearly separable at moderate tree depth. SMOTE was tried first: oversampling cmdi from 3,881 to 25,000 synthetic samples gained only +0.015 F1 at shallow depth and nothing at deeper trees, proving this was a <em>separability</em> problem, not a sample-count one. Fixed operationally with <code>max_depth=25</code> — going shallower loses cmdi entirely. What actually broke the ceiling was real, diverse data: adding 2,470 genuinely novel cmdi payloads (0% near-duplicate via MinHash) gained +0.03 to +0.05 F1 at production depth, confirming the real gap was technique coverage, not volume.</p>
+        <h4>The test set was read three times <span class="status status-open">open</span></h4>
+        <p>The held-out test set was read on 24, 25, and 26 September 2026 for the current model generation. The figures come from the last read. The thesis states that this does not fully meet its own reproducibility rule.</p>
+        <p class="chart-sub" style="margin:0.5rem 0 0">Thesis: Results, "Limitaciones de los resultados".</p>
       </div>
     </div>
 
-    <div class="limitation">
+    <div class="limitation" id="corpus-overlap">
       <div class="idx">02</div>
       <div>
-        <h4>ONNX Runtime expands trees in memory <span class="status status-accepted">inherent to ONNX Runtime</span></h4>
-        <p>ONNX's <code>TreeEnsembleClassifier</code> fully materializes trees natively — about 1.264 KB per node. The original model (367,655 nodes, 44MB on disk) expanded to 465MB RSS. The current model (180,022 nodes, 10.8MB on disk) expands to 122–147MB — a 70–74% reduction for only 0.005 macro F1 loss. This is how ONNX Runtime's RF implementation works, not something configurable away.</p>
+        <h4>Metrics measure separation inside the corpus, not generalization <span class="status status-open">open</span></h4>
+        <p>Training, validation, and test partitions share the near-duplicate structure of the corpus. All 200 cmdi payloads of the SecLists set match a partition row under normalized equality, so that cmdi coverage is not evidence of generalization. A clean-corpus run is reported on the Evaluation page.</p>
+        <p class="chart-sub" style="margin:0.5rem 0 0">Thesis: Results, "Solapamiento del corpus de 590 payloads con el entrenamiento"; annex on near-duplicates.</p>
       </div>
     </div>
 
-    <div class="limitation">
+    <div class="limitation" id="source-dependence">
       <div class="idx">03</div>
       <div>
-        <h4><code>base64_like_count</code> is a real evasion signal and a real false-positive risk <span class="status status-accepted">accepted tradeoff</span></h4>
-        <p>Used in 3,153 split nodes (~0.86% of splits, ranked #20/66 by importance), this feature counts base64-like sequences — a genuine evasion signal, but also true of legitimate JWTs, session hashes, and API keys in URLs. Traffic carrying bearer tokens or long tokens in GET params should expect a modest elevation in false positives.</p>
+        <h4>Results depend on which sources are in training <span class="status status-open">open</span></h4>
+        <p>Excluding a single source changes detection a lot for some sources. Without <code>modsec_learn</code>, <code>payloads_csv</code>, or <code>xss_dataset</code>, the benign false positive rate rises to 76.0%, 27.0%, and 94.5%. The thesis did not evaluate the model with an alternative benign corpus.</p>
+        <p class="chart-sub" style="margin:0.5rem 0 0">Thesis: Results, "Limitaciones de los resultados"; annex on leave-one-source-out.</p>
       </div>
     </div>
 
-    <div class="limitation" id="loso">
+    <div class="limitation" id="user-agent">
       <div class="idx">04</div>
       <div>
-        <h4>Generalization is bounded to the training corpus's styles <span class="status status-open">open</span></h4>
-        <p>A leave-one-source-out (LOSO) test found 0 of 9 data sources reach macro F1 ≥ 0.80 when held out entirely; only <code>command_injection</code> clears 0.60 (0.7762). Two distinct mechanisms are confirmed: volume starvation across 8 of the 9 sources (one or two "mega-sources" supply 85–99% of each class's signal), and a genuine style-driven failure in <code>synthetic_nav</code> — the smallest slice of benign data (0.9%) but by far the worst LOSO score (0.0027), independent of volume. In practice: a genuinely novel attack or benign style, unlike anything in these 9 sources, should be expected to degrade detection substantially.</p>
+        <h4>Browser User-Agents trigger false positives <span class="status status-open">open</span></h4>
+        <p>The User-Agent is one of the strongest features. Only 0.4% of benign training rows have a User-Agent longer than 40 characters, while 33.3% to 97.7% of attack rows do. With a browser User-Agent, the model blocked 97.1% of benign requests in OWASP Juice Shop (monitor mode) and 92.5% in dvws-node (block mode). The default Artillery User-Agent produced no false positives in the thesis's own app.</p>
+        <p class="chart-sub" style="margin:0.5rem 0 0">Thesis: SHAP results (ua_length, ua_present) and Results, "Falsos positivos en aplicaciones de terceros".</p>
       </div>
     </div>
 
-    <div class="limitation">
+    <div class="limitation" id="cmdi-sqli">
       <div class="idx">05</div>
       <div>
-        <h4>Near-duplicate saturation was found, not removed <span class="status status-open">open</span></h4>
-        <p>An earlier Levenshtein-based dedup pass had two real flaws — a 100-character query cutoff that silently excluded 20.6% of rows, and a 10,000-pair cap giving near-zero coverage on large classes. A later MinHash/LSH investigation confirmed genuine, extensive near-duplication: xss at 61.2x saturation, cmdi at 52.3x, path_traversal at 32.4x (pairs-to-rows ratio); sqli and benign scans didn't finish at that scale. The decision was to flag, not deduplicate, this cycle — deduplicating now risks invalidating already-trained and validated models, so it's deferred as a separate retraining decision.</p>
+        <h4>cmdi and sqli are confused in labels, not in blocking <span class="status status-accepted">accepted tradeoff</span></h4>
+        <p>In a re-measure with pair C, all 200 cmdi payloads of the corpus were labeled <code>sqli</code>. Of these, 198 were blocked and 2 were logged as <code>pass_anomaly</code>. The cause is that blind time-based techniques look alike across the two classes. The effect is on triage labels, not on the blocking decision.</p>
+        <p class="chart-sub" style="margin:0.5rem 0 0">Thesis: Results, Config 2 and the cmdi/sqli attribution note.</p>
       </div>
     </div>
 
-    <div class="limitation">
+    <div class="limitation" id="synthetic-data">
       <div class="idx">06</div>
       <div>
-        <h4>Blank method/path was a training artifact <span class="status status-resolved">resolved</span></h4>
-        <p>Several sources captured only query or body content, leaving <code>method</code>/<code>path</code> blank — impossible for a real HTTP request. Normalizing these to <code>GET</code> / <code>/</code> dropped the end-to-end benign false-positive rate from 21.0% to 2.0%.</p>
+        <h4>Part of the cmdi data is synthetic and not reproducible from the repository <span class="status status-open">open</span></h4>
+        <p>261 of the 1,468 cmdi test rows (17.8%) and 1,221 of the 6,853 cmdi training rows (17.8%) are synthetic. Their generator is not versioned in the repository, so those rows cannot be regenerated from the code.</p>
+        <p class="chart-sub" style="margin:0.5rem 0 0">Thesis: Results, "Limitaciones de los resultados".</p>
       </div>
     </div>
 
-    <div class="limitation">
+    <div class="limitation" id="threshold">
       <div class="idx">07</div>
       <div>
-        <h4>HTML-entity-encoded XSS was a detection gap <span class="status status-resolved">mostly resolved</span></h4>
-        <p>Payloads encoded as <code>&amp;lt;script&amp;gt;</code> were missed (68.9% detection pre-fix) while raw or URL-encoded markup was reliably caught. Fixing this meant decoding HTML entities before pattern matching and recalibrating the threshold from 0.70 to 0.35 — moving overall detection from 77% to 94%. The same investigation fixed unicode-escape evasion (0% → 100%) and double-percent-encoding evasion (50% → 100%). Double HTML-entity evasion was checked and found not to be a practical gap: entity-decoding only happens during HTML parsing, never JS execution, so double-encoding the payload just breaks the exploit itself.</p>
+        <h4>The 0.35 threshold was calibrated on an earlier model <span class="status status-open">open</span></h4>
+        <p>The 0.35 blocking threshold was calibrated on validation for <code>rf_v3</code> and was not recalibrated for <code>rf_v11</code>. The reported test metrics use argmax and do not apply the threshold, so no test metric exists for the deployed blocking rule.</p>
+        <p class="chart-sub" style="margin:0.5rem 0 0">Thesis: Results, "Limitaciones de los resultados" and Random Forest section.</p>
       </div>
     </div>
 
-    <div class="limitation">
+    <div class="limitation" id="isolation-forest">
       <div class="idx">08</div>
       <div>
-        <h4>Confidence depends on request context, not just payload content <span class="status status-accepted">accepted tradeoff</span></h4>
-        <p>Command-injection payloads sent with minimal HTTP context — no user-agent, cookies, or referer, i.e. raw curl or script traffic rather than browser-driven — score measurably lower confidence. Bare recon commands (<code>whoami</code>, <code>id</code>, <code>uname -a</code>, <code>env</code>, <code>ls -la /</code>, <code>ping</code>) scored 0.233–0.336 in minimal context, below the 0.35 threshold, while overtly malicious targets (<code>/etc/passwd</code>, reverse shells) still cleared it. Of 33 distinct live cmdi techniques tested, 17 always blocked, 14 blocked inconsistently depending on formatting, and only 2 (6%) never blocked in any variant. Root cause: RF's feature set includes context signals like UA length and cookie presence that correlate with "legitimate traffic" in training — stripped-context requests lose that implicit confidence boost.</p>
+        <h4>Isolation Forest never blocks, and its contribution was measured on validation only <span class="status status-accepted">by design</span></h4>
+        <p>On validation, Isolation Forest flagged 19 of the 39 attacks that Random Forest let through. Blocking those flags would also block 866 benign requests, so the component only logs. Its contribution was not evaluated on the test set.</p>
+        <p class="chart-sub" style="margin:0.5rem 0 0">Thesis: Conclusions, objective 1–2; Results, "Limitaciones de los resultados".</p>
       </div>
     </div>
 
-    <div class="limitation">
+    <div class="limitation" id="latency-memory-cpu">
       <div class="idx">09</div>
       <div>
-        <h4>Concurrent inference and IF-inclusion timing <span class="status status-resolved">resolved</span></h4>
-        <p><code>onnxruntime-node</code> serializes concurrent inference calls within a single thread — fixed by splitting RF and IF into separate dedicated worker threads. A follow-on cold-start bug (0% real-world IF-capture despite 145/145 mocked tests passing) was fixed with a readiness handshake between the main thread and workers. An initial 5ms "grace window" fix was later found to cost ~1ms of latency on ~99% of requests just paying for IF's real inference time — it was replaced with the current design: RF resolves the response immediately, and a late IF reply patches the already-written log row asynchronously.</p>
+        <h4>Memory and CPU criteria are not met, and volume latency fails <span class="status status-open">open</span></h4>
+        <p>Added memory is +331.9 to +375.9 MiB, against a 150 MB criterion. CPU rises by +529.6% to +614.4% under normal and attack load, against a 15% criterion. Under volume load, p95 overhead reaches 6,495.46 ms and 7.00% of requests time out. The measured cost is for the whole container, so it cannot be attributed to one component. A monitoring run's leak indicator is inconclusive.</p>
+        <p class="chart-sub" style="margin:0.5rem 0 0">Thesis: Results, latency and memory/CPU sections; Conclusions, general objective.</p>
       </div>
     </div>
 
-    <div class="limitation">
+    <div class="limitation" id="query-reconstruction">
       <div class="idx">10</div>
       <div>
-        <h4>Isolation Forest over-fires on benign traffic <span class="status status-open">investigated, not fixed</span></h4>
-        <p>IF's <code>pass_anomaly</code> rate on pure benign traffic measured 94.6% in live Docker testing, against an offline-calibrated target of 5.3–5.7% — about 17x higher than expected. Root cause, confirmed by ablation: the benign training corpus is 99.6% missing User-Agent headers, so IF learned "no UA = normal," backwards from real traffic where a UA is essentially always present. Adding synthetic UA-bearing benign data at increasing scale regressed IF's recall on other attack classes by as much as −11.7pp (cmdi), −6.3pp (path_traversal), −5.5pp (sqli), −2.5pp (xss) — realistic benign traffic moves structurally closer to attack traffic. Decision: not pursued. IF has no blocking authority, so this is accepted as log/webhook noise, not a security regression — but if you wire <code>pass_anomaly</code> into an alerting pipeline, expect it to be loud.</p>
+        <h4>Test features do not include the query rebuild effect <span class="status status-open">open</span></h4>
+        <p>The test set is vectorized from stored strings, but the middleware rebuilds the query with <code>URLSearchParams</code> before extracting features. For the same request this can change some feature values, for example <code>quote_count</code> from 1 to 0. The test metrics do not include this effect, which was not measured. A later commit stops re-encoding the query, but it postdates the thesis evaluations.</p>
+        <p class="chart-sub" style="margin:0.5rem 0 0">Thesis: Results, "Limitaciones de los resultados".</p>
       </div>
     </div>
 
@@ -132,25 +137,25 @@
 <section class="bg-sunken">
   <div class="wrap">
     <div class="section-head">
-      <span class="eyebrow">Other caveats</span>
-      <h2>Found during evaluation, not in the numbered list</h2>
+      <span class="eyebrow">Also in scope</span>
+      <h2>Other boundaries stated in the thesis</h2>
     </div>
     <div class="grid-2">
       <div class="card">
-        <h4>cmdi/sqli get confused in reporting, not in blocking</h4>
-        <p>A time-based blind technique like <code>sleep(N)</code> is syntactically identical between sqli and cmdi, and <code>semicolon_count</code> is a feature shared by both. At one point ~49% of cmdi payloads were mislabeled as sqli in reporting; the current minimal-context retrain narrowed this to ~35%. Blocking behavior is unaffected either way — only the triage label can be wrong.</p>
+        <h4>No online learning</h4>
+        <p>Models are trained offline and shipped fixed with each release. Continuous learning was excluded from the project's scope, and the library does not retrain from your traffic.</p>
       </div>
       <div class="card">
-        <h4>Real browser UA strings can trip a false positive</h4>
-        <p>A plain <code>GET /posts</code> from real Firefox, no payload at all, was blocked at 62% confidence as sqli — because <code>ua_length</code> is the single most important RF feature, and a real 78-character Firefox UA looked nothing like the short synthetic UAs in training.</p>
+        <h4>Four attack classes only</h4>
+        <p>logSguarDian covers SQL injection, XSS, path traversal, and command injection within a single request. DDoS and brute force are out of scope because they depend on several requests.</p>
       </div>
       <div class="card">
-        <h4>Identical query, different User-Agent, different verdict</h4>
-        <p>The same benign query ("weekend hiking trip"), same session — only the User-Agent changed: <code>curl/8.7.1</code> scored 0.367 (passed), <code>Python-urllib/3.14</code> scored 0.400 (blocked as sqli), a custom corpus-runner UA scored 0.616 (blocked as sqli). Incidental client metadata, not just payload semantics, can flip a near-threshold verdict.</p>
+        <h4>Data provenance gaps</h4>
+        <p>The source of data restored on 23 September 2026 is not documented. The corpus has 383,202 rows in features, and 383,083 in <code>unified.jsonl</code>. The 119-row difference is the simulated telemetry source.</p>
       </div>
       <div class="card">
-        <h4>Ordinary forms score near the sqli threshold on purpose</h4>
-        <p><code>POST /posts</code> with <code>title=Hello&amp;content=Just a normal note</code> scores sqli at ~0.40 because <code>sqli_operator_count</code> matches ordinary <code>key=value&amp;key=value</code> form syntax. This is not fixed: 37.4% of all sqli training rows rely on this exact feature as their only nonzero signal, so narrowing the regex would destroy detection for over a third of the sqli corpus. It's documented as an accepted model-boundary limitation, not an oversight.</p>
+        <h4>Round 5 is not a blind evaluation</h4>
+        <p>The model was rebuilt after the Round 5 results were known, and the history does not link the two events. The 0.1.1 package runs in that round were executed by the co-author and are reported in the annex.</p>
       </div>
     </div>
   </div>
@@ -175,19 +180,20 @@
       <div>
         <h4>Links</h4>
         <ul>
-          <li><a href="https://github.com/xtsebas/logSguarDian" target="_blank" rel="noopener">GitHub repository</a></li>
+          <li><a href="https://github.com/logSguarDian2026/logSguarDian" target="_blank" rel="noopener">GitHub repository</a></li>
           <li><a href="https://www.npmjs.com/package/logsguardian" target="_blank" rel="noopener">npm package</a></li>
-          <li><a href="https://github.com/xtsebas/logSguarDian/blob/main/LICENSE" target="_blank" rel="noopener">MIT license</a></li>
+          <li><a href="https://github.com/logSguarDian2026/logSguarDian/blob/main/LICENSE" target="_blank" rel="noopener">MIT license</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 Sebastián Huertas &amp; Diego Valenzuela — Universidad del Valle de Guatemala</span>
-      <span>logsguardian@0.1.0</span>
+      <span>© 2026 Sebastián Huertas Gómez &amp; Diego Pablo Valenzuela Palacios — Universidad del Valle de Guatemala</span>
+      <span>logsguardian@<span data-version>0.1.1</span></span>
     </div>
   </div>
 </footer>
 
+<script src="js/site-config.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

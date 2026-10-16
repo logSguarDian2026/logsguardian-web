@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>logSguarDian — ML request inspection for Express</title>
-<meta name="description" content="Open-source RASP middleware for Node.js/Express that blocks SQL injection, XSS, path traversal, and command injection with a hybrid Random Forest + Isolation Forest model — no WAF configuration required." />
+<meta name="description" content="Open-source RASP middleware for Node.js/Express that blocks SQL injection, XSS, path traversal, and command injection with a hybrid Random Forest + Isolation Forest model." />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%230e8f73%22/><path d=%22M30 52 L45 67 L72 34%22 stroke=%22%23f4f6f5%22 stroke-width=%229%22 fill=%22none%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/></svg>" />
 <link rel="stylesheet" href="css/tokens.css" />
 <link rel="stylesheet" href="css/main.css" />
@@ -22,9 +22,9 @@
       <li><a href="about.html">About</a></li>
     </ul>
     <div class="nav-cta">
-      <a class="btn btn-ghost btn-text" href="https://github.com/xtsebas/logSguarDian" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn btn-ghost btn-text" href="https://github.com/logSguarDian2026/logSguarDian" target="_blank" rel="noopener">GitHub</a>
       <a class="btn btn-primary" href="https://www.npmjs.com/package/logsguardian" target="_blank" rel="noopener">npm install</a>
-      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+      <button type="button" class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
         <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
         <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
       </button>
@@ -36,19 +36,19 @@
   <div>
     <span class="eyebrow">RASP middleware · Node.js / Express</span>
     <h1>Your Express app, inspecting its own traffic.</h1>
-    <p class="lede">logSguarDian is a one-line middleware that classifies every incoming request with a Random Forest trained on ~380,000 labeled HTTP requests, and blocks SQL injection, XSS, path traversal, and command injection before they reach your route handlers — no proxy, no signature rules to tune.</p>
+    <p class="lede">logSguarDian is a one-line middleware. A Random Forest trained on 268,240 labeled HTTP requests decides when to block SQL injection, XSS, path traversal, and command injection, before your route handlers run. An Isolation Forest logs anomalies but never blocks.</p>
 
     <div class="hero-actions">
       <div class="install-line">
         <code>npm install logsguardian</code>
-        <button data-copy="npm install logsguardian" aria-label="Copy install command">copy</button>
+        <button type="button" data-copy="npm install logsguardian" aria-label="Copy install command">copy</button>
       </div>
     </div>
 
     <div class="badges">
-      <a class="badge-pill" href="https://www.npmjs.com/package/logsguardian" target="_blank" rel="noopener"><span class="badge-dot"></span>npm <span class="badge-val">0.1.0</span></a>
+      <a class="badge-pill" href="https://www.npmjs.com/package/logsguardian" target="_blank" rel="noopener"><span class="badge-dot"></span>npm <span class="badge-val" data-version>0.1.1</span></a>
       <a class="badge-pill" href="https://www.npmjs.com/package/logsguardian" target="_blank" rel="noopener">node <span class="badge-val">≥20</span></a>
-      <a class="badge-pill" href="https://github.com/xtsebas/logSguarDian/blob/main/LICENSE" target="_blank" rel="noopener">license <span class="badge-val">MIT</span></a>
+      <a class="badge-pill" href="https://github.com/logSguarDian2026/logSguarDian/blob/main/LICENSE" target="_blank" rel="noopener">license <span class="badge-val">MIT</span></a>
     </div>
   </div>
 
@@ -64,7 +64,7 @@
       <div class="inspector-row"><span class="k">if score</span><span class="v">below anomaly threshold</span></div>
       <div class="verdict">
         <span class="tag">403 · blocked</span>
-        <span class="conf">confidence 0.98 ≥ threshold 0.35</span>
+        <span class="conf">illustrative example · RF threshold 0.35</span>
       </div>
     </div>
   </div>
@@ -74,21 +74,21 @@
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">Why</span>
-      <h2>Most SMEs can't staff a security team, or tune a WAF.</h2>
-      <p class="lede">Small and mid-sized Node.js shops in Guatemala and across Latin America usually run without a dedicated security function. A properly-tuned WAF like ModSecurity is powerful, but configuring it — writing rules, managing paranoia levels, chasing false positives — takes expertise most five-person engineering teams don't have time to build.</p>
+      <h2>Most small teams can't staff a security team, or tune a WAF.</h2>
+      <p class="lede">Small and mid-sized Node.js teams often run without a dedicated security function. A properly tuned WAF like ModSecurity is powerful, but writing rules, managing paranoia levels, and chasing false positives takes expertise most small engineering teams don't have.</p>
     </div>
     <div class="grid-3">
       <div class="card">
         <h4>Install, don't operate</h4>
-        <p>One middleware line after your body parsers. No reverse proxy to stand up, no rule language to learn, no separate service to keep alive.</p>
+        <p>One middleware line after your body parsers. No reverse proxy to stand up and no separate service to keep alive. The middleware runs in your process.</p>
       </div>
       <div class="card">
         <h4>Statistical, not signature-based</h4>
-        <p>A Random Forest classifies structure and intent instead of matching known strings — the same reason it catches what pattern-matching WAFs miss.</p>
+        <p>A Random Forest classifies request structure instead of matching known strings. On the held-out test set it separates the classes well, and the test set is not a substitute for real traffic (see Limitations).</p>
       </div>
       <div class="card">
-        <h4>Sits behind a WAF, not instead of one</h4>
-        <p>Designed for defense in depth: it doesn't replace ModSecurity or Cloudflare, it catches what gets through. <a href="evaluation.html#defense-in-depth">See the measurement →</a></p>
+        <h4>Designed to sit behind a WAF</h4>
+        <p>It is meant for defense in depth, not as a replacement. In our layered test it caught 37 of the 40 attacks that ModSecurity let through. <a href="evaluation.html#defense-in-depth">See the measurement →</a></p>
       </div>
     </div>
   </div>
@@ -99,26 +99,26 @@
     <div class="section-head">
       <span class="eyebrow">How it works</span>
       <h2>A hybrid model, running off the event loop.</h2>
-      <p class="lede">Every request is turned into a 73-feature vector and scored by two models in dedicated worker threads, so ML inference never blocks Node's event loop.</p>
+      <p class="lede">Every request becomes a 76-feature vector. Two ONNX models score it in dedicated worker threads, so inference does not block Node's event loop.</p>
     </div>
 
     <div class="grid-2">
       <div class="card">
         <h4>Random Forest — the blocking authority</h4>
-        <p>Classifies each request as <code>benign</code>, <code>sqli</code>, <code>xss</code>, <code>path_traversal</code>, or <code>cmdi</code>. If the top class isn't benign and its confidence clears the threshold (0.35 by default), the request is blocked with an HTTP 403. RF is the <em>only</em> model with blocking authority.</p>
+        <p>Uses 69 of the 76 features and classifies each request as <code>benign</code>, <code>sqli</code>, <code>xss</code>, <code>path_traversal</code>, or <code>cmdi</code>. If the top class is an attack and its confidence reaches the threshold (0.35 by default), the request gets an HTTP 403. RF is the only model with blocking authority.</p>
       </div>
       <div class="card">
         <h4>Isolation Forest — anomaly logging, never blocking</h4>
-        <p>Trained only on benign traffic, it flags statistically unusual requests that don't match a known attack signature — for logging and webhooks, not enforcement. A <code>pass_anomaly</code> verdict never becomes a 403.</p>
+        <p>Uses 63 features, trained only on benign traffic. It flags requests that look statistically unusual, for logging and webhooks. A <code>pass_anomaly</code> verdict never becomes a 403.</p>
       </div>
     </div>
 
     <div class="card" style="margin-top:1.75rem;">
       <h4>Fail-open, by design</h4>
-      <p style="margin-bottom:0">If the RF worker hasn't loaded, crashes, or doesn't answer inside <code>timeoutMs</code> (50ms default), the request is forwarded unchanged. The middleware is built to never become a denial-of-service vector against your own app.</p>
+      <p style="margin-bottom:0">If the RF worker has not loaded, has crashed, or does not answer within <code>timeoutMs</code> (50 ms by default), the request is forwarded unchanged.</p>
     </div>
 
-    <p style="margin-top:1.75rem;"><a href="docs.html#architecture" class="kicker-link">Full pipeline, decision-policy formula, and feature breakdown →</a></p>
+    <p style="margin-top:1.75rem;"><a href="docs.html#architecture" class="kicker-link">Full pipeline, decision policy, and feature breakdown →</a></p>
   </div>
 </section>
 
@@ -126,15 +126,45 @@
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">Measured, not claimed</span>
-      <h2>Every number here has a test set and a corpus behind it.</h2>
+      <h2>Macro metrics on a held-out test set.</h2>
+      <p class="lede">Figures for the model shipped in version <span data-version>0.1.1</span> (<code>rf_v11</code> / <code>if_v10</code>). They measure separation inside the corpus, not performance on unseen traffic.</p>
     </div>
     <div class="stat-grid">
-      <div class="stat"><span class="num">99.96%</span><span class="label">RF precision, held-out test set</span></div>
-      <div class="stat"><span class="num">99.89%</span><span class="label">RF recall, held-out test set</span></div>
-      <div class="stat"><span class="num">99.5%</span><span class="label">Coverage layered behind a WAF, 590-payload corpus</span></div>
-      <div class="stat"><span class="num">37/40</span><span class="label">Attacks the WAF missed that logSguarDian caught alone</span></div>
+      <div class="stat"><span class="num">0.9776</span><span class="label">RF macro F1, 5 classes</span></div>
+      <div class="stat"><span class="num">0.9751</span><span class="label">RF macro precision</span></div>
+      <div class="stat"><span class="num">0.9804</span><span class="label">RF macro recall</span></div>
+      <div class="stat"><span class="num">57,481</span><span class="label">Held-out test rows, read three times</span></div>
     </div>
-    <p style="margin-top:1.75rem;"><a href="evaluation.html" class="kicker-link">Full methodology, per-class numbers, and latency data →</a></p>
+    <p style="margin-top:1.75rem;"><a href="evaluation.html" class="kicker-link">Per-class numbers, Isolation Forest, and methodology →</a></p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">What does not meet its criteria</span>
+      <h2>Memory and CPU are over budget. Latency meets its absolute limit only under normal and attack load.</h2>
+      <p class="lede">Criteria come from the thesis's approved protocol. Measurements come from a Docker and Postgres run on a 2-vCPU Linux runner, using an earlier build of the model than the one in version <span data-version>0.1.1</span> (see the note in Evaluation).</p>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h4>Memory <span class="status status-open">not met</span></h4>
+        <p>Added memory is +331.9 MiB under attack and +332.0 MiB under normal load, against a 150 MB (≈143 MiB) criterion. Under volume load it is +375.9 MiB.</p>
+      </div>
+      <div class="card">
+        <h4>CPU <span class="status status-open">not met</span></h4>
+        <p>Relative CPU increase is +529.6% under attack and +614.4% under normal load, against a criterion of up to 15%.</p>
+      </div>
+      <div class="card">
+        <h4>Latency, normal and attack load <span class="status status-resolved">met</span></h4>
+        <p>Absolute p95 overhead is 12.08 ms under normal load and 12.85 ms under attack load, against a 15 ms limit.</p>
+      </div>
+      <div class="card">
+        <h4>Latency, volume load <span class="status status-open">not met</span></h4>
+        <p>Overhead rises to 6,495.46 ms at p95, and 7.00% of requests time out in that scenario.</p>
+      </div>
+    </div>
+    <p style="margin-top:1.75rem;"><a href="evaluation.html#latency" class="kicker-link">Latency, memory, and CPU detail →</a></p>
   </div>
 </section>
 
@@ -142,8 +172,8 @@
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">Defense in depth</span>
-      <h2>Behind ModSecurity + OWASP CRS, on an independent corpus.</h2>
-      <p class="lede">590 payloads from SecLists, deduplicated, run against a Postgres-backed vulnerable app in four configurations. logSguarDian was never tuned against this corpus before the run.</p>
+      <h2>Behind ModSecurity + OWASP CRS, on a corpus that overlaps training.</h2>
+      <p class="lede">590 payloads from SecLists, run against a Postgres-backed vulnerable app in four configurations. Part of this corpus is in the training data, so these numbers are not an independent test. The cleaner evidence is in the Evaluation page.</p>
     </div>
 
     <div class="legend">
@@ -166,9 +196,9 @@
     </div>
 
     <div class="callout" style="margin-top:2rem;">
-      <p><strong>Of the 40 attacks CRS missed, logSguarDian independently caught 37.</strong> Only 3 payloads passed both layers — none were exploitable against the target app. That's the case for defense in depth, measured rather than assumed.</p>
+      <p><strong>Of the 40 attacks that CRS (PL1) missed, logSguarDian caught 37 after they passed the WAF.</strong> Only 3 payloads passed both layers, and none is a working exploit against the target app.</p>
     </div>
-    <p><a href="evaluation.html#defense-in-depth" class="kicker-link">Per-class breakdown and methodology →</a></p>
+    <p><a href="evaluation.html#defense-in-depth" class="kicker-link">Per-class breakdown, overlap, and clean-corpus run →</a></p>
   </div>
 </section>
 
@@ -176,24 +206,24 @@
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">Said plainly</span>
-      <h2>Where it's still limited.</h2>
-      <p class="lede">Ten limitations are documented with root-cause investigations in the repo. Three worth knowing before you install:</p>
+      <h2>Where it is still limited.</h2>
+      <p class="lede">Three limits matter most before you install. The full list is on the Limitations page.</p>
     </div>
     <div class="grid-3">
+      <div class="card">
+        <h4>Browser User-Agents can trigger false positives</h4>
+        <p>The User-Agent is one of the strongest features. With a browser User-Agent, the model blocked 97.1% of benign requests in OWASP Juice Shop (monitor mode) and 92.5% in dvws-node (block mode).</p>
+      </div>
       <div class="card">
         <h4>No online learning</h4>
         <p>Models are trained offline and shipped fixed with each release. Detection quality depends on the version you install, not on how long it has run against your traffic.</p>
       </div>
       <div class="card">
-        <h4>Relative latency gate not yet met</h4>
-        <p>Absolute overhead is small — roughly 0.1–15ms depending on environment — but the project's own ≤10% <em>relative</em> target isn't cleared against very low-latency baselines.</p>
-      </div>
-      <div class="card">
-        <h4><code>pass_anomaly</code> is noisy</h4>
-        <p>The Isolation Forest fires on ordinary benign traffic more often than its offline calibration suggests. It never blocks — but treat it as a noisy signal, not a precise one.</p>
+        <h4><code>pass_anomaly</code> is a log signal, not a block</h4>
+        <p>The Isolation Forest never blocks, and it flags 19 of the 39 attacks that Random Forest lets through on validation, at the cost of 866 benign requests. Treat it as a noisy log signal.</p>
       </div>
     </div>
-    <p style="margin-top:1.75rem;"><a href="limitations.html" class="kicker-link">All ten, with root causes →</a></p>
+    <p style="margin-top:1.75rem;"><a href="limitations.html" class="kicker-link">All limitations, with the evidence behind each →</a></p>
   </div>
 </section>
 
@@ -202,9 +232,9 @@
     <div class="section-head">
       <span class="eyebrow">A thesis project</span>
       <h2>Built at Universidad del Valle de Guatemala.</h2>
-      <p class="lede">Sebastián Huertas built the middleware architecture, CLI, and library engineering. Diego Valenzuela built the ML pipeline, feature engineering, and model training. Both own testing and core logic.</p>
+      <p class="lede">Sebastián Huertas Gómez implemented the initial 72-feature extractor and its move to worker threads. Diego Pablo Valenzuela Palacios analyzed and justified each feature, defined the input contract, added four features and their corrections, and built the training, ONNX export, and retraining pipeline.</p>
     </div>
-    <p><a href="about.html" class="kicker-link">More about the project and the team →</a></p>
+    <p><a href="about.html" class="kicker-link">More about the project, the team, and the use of AI →</a></p>
   </div>
 </section>
 
@@ -227,19 +257,20 @@
       <div>
         <h4>Links</h4>
         <ul>
-          <li><a href="https://github.com/xtsebas/logSguarDian" target="_blank" rel="noopener">GitHub repository</a></li>
+          <li><a href="https://github.com/logSguarDian2026/logSguarDian" target="_blank" rel="noopener">GitHub repository</a></li>
           <li><a href="https://www.npmjs.com/package/logsguardian" target="_blank" rel="noopener">npm package</a></li>
-          <li><a href="https://github.com/xtsebas/logSguarDian/blob/main/LICENSE" target="_blank" rel="noopener">MIT license</a></li>
+          <li><a href="https://github.com/logSguarDian2026/logSguarDian/blob/main/LICENSE" target="_blank" rel="noopener">MIT license</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 Sebastián Huertas &amp; Diego Valenzuela — Universidad del Valle de Guatemala</span>
-      <span>logsguardian@0.1.0</span>
+      <span>© 2026 Sebastián Huertas Gómez &amp; Diego Pablo Valenzuela Palacios — Universidad del Valle de Guatemala</span>
+      <span>logsguardian@<span data-version>0.1.1</span></span>
     </div>
   </div>
 </footer>
 
+<script src="js/site-config.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

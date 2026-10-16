@@ -1,4 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll("[data-version]").forEach((el) => {
+    el.textContent = window.LOGSGUARDIAN_CONFIG.version;
+  });
+
   const toggle = document.querySelector(".nav-toggle");
   if (toggle) {
     toggle.addEventListener("click", () => {
